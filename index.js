@@ -1,93 +1,108 @@
-const numButtons = document.querySelectorAll('.num')
-const operatorButtons = document.querySelectorAll('.operador')
-const deleteButton = document.querySelector('.deletar')
-const clearButton = document.querySelector('.limpar')
-const visorAtual = document.querySelector('.valor-atual')
-const visorAnterior = document.querySelector('.valor-anterior')
-let prevValue = ''
-let actualValue = ''
-let operator = ''
-let overwrite = true
-
+const numbers = document.querySelectorAll('.num')
+const operators = document.querySelectorAll('.operador')
+const prevElement = document.querySelector('.valor-anterior')
+const currentElement = document.querySelector('.valor-atual')
+const equals = document.querySelector('.equals')
+const clear = document.querySelector('.limpar')
+const erase = document.querySelector('.deletar')
 
 class Calculator {
-    constructor(prevValue, actualValue, operator){
-        this.prevValue = prevValue
-        this.actualValue = actualValue
-        this.operator = operator
+    currentValue = ''
+    prevValue = ''
+    operator = ''
+
+    constructor(prevElement, currentElement){
+        this.prevElement = prevElement
+        this.currentElement = currentElement
     }
 
     clear(){
+        this.currentValue = ''
         this.prevValue = ''
-        this.actualValue = ''
         this.operator = ''
-
-        this.updateScreen()
     }
 
-    updateScreen(){
-        visorAtual.innerText = this.actualValue
-        visorAnterior.innerText = this.prevValue + this.operator
+    addNum(number){
+        if(number == '.' && this.currentValue.includes('.')) return
+        this.currentValue = this.currentValue.toString() + number.toString()
+    }
+
+    erase(){
+        this.currentValue = this.currentValue.slice(0, -1)
     }
 
     selectOperator(operator){
-        operator == "=" ? this.operator = '' : 
+        if(this.prevValue != ''){
+            this.calc()
+        }
+        if (this.currentValue == '') return
         this.operator = operator
+        this.prevValue = this.currentValue
+        this.currentValue = ''
     }
 
     calc(){
-        if(this.prevValue.length != 0){
-            switch (this.operator){
+        let result
+        let prev = parseFloat(this.prevValue)
+        let current = parseFloat(this.currentValue)
+
+        if(prev != isNaN & current != isNaN){
+            switch(this.operator){
                 case "+":
-                    this.prevValue = parseFloat(this.prevValue) + parseFloat(this.actualValue)
+                    result = prev + current
                     break;
                 case "-":
-                    this.prevValue = parseFloat(this.prevValue) - parseFloat(this.actualValue)
+                    result = prev - current
                     break;
                 case "*":
-                    this.prevValue = parseFloat(this.prevValue) * parseFloat(this.actualValue)
+                    result = prev * current
+                    break;
+                case "/":
+                    result = prev / current
                     break;
                 default:
-                    console.log("deu bosta")
+                    return
             }
+            this.currentValue = result.toString()
+            this.prevValue = ''
+            this.operator = ''
         }
     }
 
+    updateScreen(){
+        this.currentElement.innerText = this.currentValue
+        this.prevElement.innerText = `${this.prevValue} ${this.operator}`
+
+    }
 }
 
-const calculator = new Calculator(prevValue, actualValue, operator)
+const calculator = new Calculator(prevElement, currentElement)
 
-numButtons.forEach(e => {
-    e.addEventListener('click', e => {
-        if (overwrite && calculator.operator != '' && calculator.prevValue != ''){
-            calculator.actualValue = ''
-            overwrite = false
-        }
-        calculator.actualValue = calculator.actualValue + e.target.value
+numbers.forEach(button => {
+    button.addEventListener('click', () =>{
+        calculator.addNum(button.value)
         calculator.updateScreen()
     })
 })
 
-clearButton.addEventListener('click', e => {
-    operator = ''
-    actualValue = ''
-    prevValue = ''
+clear.addEventListener('click', () => {
     calculator.clear()
+    calculator.updateScreen()
 })
 
-operatorButtons.forEach(e => {
-    e.addEventListener('click', e => {
-        calculator.calc()
-        overwrite = true
-        calculator.selectOperator(e.target.value)
-        if(e.target.value == '='){
-            calculator.actualValue = calculator.prevValue
-        }
-        if(calculator.prevValue == ''){
-            calculator.prevValue = calculator.actualValue
-        }
-
-        console.log(calculator.prevValue)
+operators.forEach(button => {
+    button.addEventListener('click', ()=>{
+        calculator.selectOperator(button.value)
         calculator.updateScreen()
     })
+})
+
+equals.addEventListener('click', () => {
+    calculator.calc()
+    calculator.updateScreen()
+})
+
+erase.addEventListener('click', () => {
+    calculator.erase()
+    calculator.updateScreen()
 })
