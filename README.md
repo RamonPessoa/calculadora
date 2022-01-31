@@ -2,7 +2,7 @@
 <p align="center">Calculadora feita sem utilizar o método eval do javascript</p>
 
 <h2>Sobre</h2>
-	<p>O objetivo deste projeto é exrecitar a lógica de programação
+	<p>O objetivo deste projeto é exercitar a lógica de programação
     </p>
 <h3>tecnologias utilizadas:</h3>
 	<ul>
